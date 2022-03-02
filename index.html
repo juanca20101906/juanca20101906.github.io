@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MorphCast SDK - Demo with graphical elements</title>
-    <style>
+    <title>TP Sentiment Analysis</title>
+     <style>
+      .container{ width: 600px; float: left;}
+      .title{ font-size: 12pt; font-weight: bold;}
+        #analysis{
+            width: 400px;
+            min-height: 240px;
+            border: 1px solid #008000;            
+        }
+        #camara{
+            width: 320px;
+            min-height: 240px;
+            border: 1px solid #008000;
+            align-items: right;
+        }
         #start_over {
             position: absolute;
-            background-color: #7F8C8D;
+            background-color: #7C0098;
             top: 0;
             left: 0;
             right: 0;
@@ -17,7 +30,7 @@
 
         #start_over span {
             position: absolute;
-            font-size: 20px;
+            font-size: 30px;
             top: 0;
             bottom: 0;
             left: 0;
@@ -30,21 +43,33 @@
         }
 
         #myProgress {
-            width: 50%;
-            background-color: gray;
+            width: 86%;
+            background-color: rgb(189, 185, 185);
         }
 
         #myBar {
             width: 1%;
             height: 30px;
-            background-color: green;
+            background-color: #D60088;
         }
+             
+        #videoContainer {
+          margin: 0px auto;
+          width: 550px;
+          height: 450px;
+          border: 10px #aeadaf solid;
+        }
+        #videoElement {
+          width: 550px;
+          height: 450px;
+          background-color: rgb(189, 185, 185);
+        }        
     </style>
     <!-- configuration for the Alert plugin -->
     <meta name="mphtools-feature" content="compatibilityUI, cameraPrivacyPopup, compatibilityAutoCheck">
 </head>
 <body>
-    <h1 style="text-align:center"> Sentiment Analysis </h1>
+    <h1 style="text-align:left; font-family: segoe ui;"> Sentiment Analysis </h1>
 <!-- include automatic alerts about browser and App compatibility -->
 <script src="https://sdk.morphcast.com/mphtools/v1.0/mphtools.js"></script>
 <!-- include MorphCast SDK -->
@@ -53,18 +78,30 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <!-- elements of the page -->
-<div><b>Results</b></div>
-<div id="age">Likely Age: -</div>
-<div id="gender">Likely Gender: -</div>
-<div id="emotion">Dominant Emotion: -</div>
-<span>Histogram of Emotions:</span>
-<div id="chart"></div>
-<div id="start_over">
-    <span>CLICK TO START</span>
+<!--<div><b>Results</b></div> -->
+<div class="container">  
+  <div id="age" style="font-family: segoe ui;">Likely Age: -</div>
+  <div id="gender" style="font-family: segoe ui;">Likely Gender: -</div>
+  <div id="emotion" style="font-family: segoe ui;">Dominant Emotion: -</div>
+  <span style="font-family: segoe ui;">Histogram of Emotions:</span>
+  <div id="chart"></div>
+
+  <span style="font-family: segoe ui;">Attention level:</span>
+  <div id="myProgress">
+      <div id="myBar"></div>
+  </div>
 </div>
-<span>Attention level:</span>
-<div id="myProgress">
-    <div id="myBar"></div>
+
+<div class="container">  
+  <div id="videoContainer">
+    <video autoplay="true" id="videoElement">
+    
+    </video>
+  </div> 
+</div>
+
+<div id="start_over">
+  <span style="font-family: segoe ui;">CLICK TO START</span>
 </div>
 
 <script>
@@ -73,7 +110,7 @@
 
   const initSDK = new Promise((res) => {
     res(CY.loader()
-      .licenseKey("ee9ca40c75046c939854fdfacba44c48070f76db8cab")
+      .licenseKey("b787f9d1d485505d611cc4d379b8012f6eff0bb7cfed")
       .addModule(CY.modules().FACE_AGE.name)
       .addModule(CY.modules().FACE_GENDER.name)
       .addModule(CY.modules().FACE_EMOTION.name)
@@ -90,7 +127,7 @@
   var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
   today = mm + '/' + dd + '/' + yyyy;
-  document.write(today);
+  
     
   window.addEventListener(CY.modules().FACE_AGE.eventName, (evt) => {
     age_div.innerHTML = 'Likely Age: ' + evt.detail.output.numericAge + ' years';
@@ -143,6 +180,18 @@
     elem.style.width = attention * 100 + "%";
   });
 
+  var video = document.querySelector("#videoElement");
+
+  if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+          video.srcObject = stream;
+        })
+        .catch(function (err0r) {
+          console.log("Something went wrong!");
+        });
+    };
+
   /*
   Elements of the page
    */
@@ -164,6 +213,7 @@
       width: 500,
       type: 'bar'
     },
+    colors: ['#7C0098'],
     yaxis: {
       min:0,
       max:100
